@@ -2,9 +2,8 @@ require 'rspec'
 
 require File.join(File.dirname(__FILE__), 'gilded_rose')
 
-## If "Aged_brie" item quality goes up by 2
-# if "Backstage passes to a TAFKAL80ETC concert" item quality stays the same
-# if "Sulfuras, Hand of Ragnaros" item quality stays the same
+# Refactoring the code to be not bad
+# test coverage??
 
 describe GildedRose do
   it "does not change the name" do
@@ -13,34 +12,53 @@ describe GildedRose do
     expect(items[0].name).to eq "foo"
   end
 
-  describe "when the item is 'Aged Brie'" do 
+
+  context "when the item is 'Aged Brie'" do 
     it "increased the quality" do 
       items = [Item.new("Aged Brie", 0, 0)]
       GildedRose.new(items).update_quality()
       expect(items[0].quality).to eq 2
     end
 
-    context "and the sell in is < 0" do 
+    context "and the sell_in is < 0" do 
       it "increased the quality" do 
         items = [Item.new("Aged Brie", -1, 0)]
         GildedRose.new(items).update_quality()
         expect(items[0].quality).to eq 2
       end
+
+      it "reduces the sell_in" do 
+        items = [Item.new("Aged Brie", -1, 0)]
+        GildedRose.new(items).update_quality()
+        expect(items[0].sell_in).to eq (-2)
+      end
     end
 
-    context "and the sell in is < 6" do 
+    context "and the sell_in is < 6" do 
       it "increased the quality" do 
         items = [Item.new("Aged Brie", 4, 0)]
         GildedRose.new(items).update_quality()
         expect(items[0].quality).to eq 1
       end
+
+      it "reduces the sell_in" do 
+        items = [Item.new("Aged Brie", 8, 0)]
+        GildedRose.new(items).update_quality()
+        expect(items[0].sell_in).to eq 7
+      end
     end
 
-    context "and the sell in is > 6 but < 11" do 
+    context "and the sell_in is > 6 but < 11" do 
       it "increased the quality" do 
         items = [Item.new("Aged Brie", 9, 0)]
         GildedRose.new(items).update_quality()
         expect(items[0].quality).to eq 1
+      end
+
+      it "reduces the sell_in" do 
+        items = [Item.new("Aged Brie", 8, 0)]
+        GildedRose.new(items).update_quality()
+        expect(items[0].sell_in).to eq 7
       end
     end
 
@@ -50,6 +68,12 @@ describe GildedRose do
         GildedRose.new(items).update_quality()
         expect(items[0].quality).to eq 3
       end
+
+      it "reduces the sell_in" do 
+        items = [Item.new("Aged Brie", 8, 1)]
+        GildedRose.new(items).update_quality()
+        expect(items[0].sell_in).to eq 7
+      end
     end
 
     context "and the initial quality is > 50" do 
@@ -57,6 +81,12 @@ describe GildedRose do
         items = [Item.new("Aged Brie", 0, 51)]
         GildedRose.new(items).update_quality()
         expect(items[0].quality).to eq 51
+      end
+
+      it "reduces the sell_in" do 
+        items = [Item.new("Aged Brie", 8, 51)]
+        GildedRose.new(items).update_quality()
+        expect(items[0].sell_in).to eq 7
       end
     end
   end
